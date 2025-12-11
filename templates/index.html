@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Council 🤖⚖️</title>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+    :root {
+        --color-bg: #0d0d18;
+        --color-panel: #1b1d34;
+        --color-panel-alt: #22254a;
+        --color-border: #f8f871;
+        --color-border-dark: #080814;
+        --color-shadow: #04040a;
+        --color-text: #f6f6ff;
+        --color-muted: #a0a7d9;
+        --color-accent: #ff6b6b;
+        --color-accent-alt: #79f29d;
+        --color-warning: #ff4f79;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        font-family: 'VT323', monospace;
+        font-size: 20px;
+        letter-spacing: 0.02em;
+        min-height: 100vh;
+        padding: 36px 20px 60px;
+        display: flex;
+        justify-content: center;
+    }
+
+    body::selection {
+        background-color: var(--color-border);
+        color: #000;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1100px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .header {
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .header h1 {
+        font-family: 'Press Start 2P', cursive;
+        font-size: clamp(2.2rem, 4vw, 3.2rem);
+        letter-spacing: 0.14em;
+        color: var(--color-text);
+        text-shadow: 4px 4px 0 #000;
+    }
+
+    .header p {
+        margin-top: 14px;
+        font-size: clamp(0.95rem, 2vw, 1.05rem);
+        color: var(--color-muted);
+        letter-spacing: 0.18em;
+    }
+
+    .header-sub {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.68rem;
+        color: var(--color-border);
+        letter-spacing: 0.18em;
+    }
+
+    .status-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        align-items: center;
+        background-color: var(--color-panel-alt);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 12px;
+        padding: 18px 22px;
+        box-shadow: 0 6px 0 var(--color-shadow);
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-led {
+        width: 14px;
+        height: 14px;
+        border: 3px solid #000;
+        background-color: var(--color-accent-alt);
+        box-shadow: 2px 2px 0 #000;
+        animation: blink 1.4s steps(2) infinite;
+    }
+
+    .status-led.offline {
+        background-color: var(--color-warning);
+        animation: none;
+    }
+
+    .status-value {
+        color: var(--color-border);
+    }
+
+    .pixel-divider {
+        height: 4px;
+        background-color: var(--color-border);
+        box-shadow: 0 4px 0 #000;
+        border-radius: 4px;
+    }
+
+    .question-card,
+    .moderator-card,
+    .verdict-card {
+        background-color: var(--color-panel);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 8px 0 var(--color-shadow);
+        position: relative;
+    }
+
+    .question-card h2 {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 1.05rem;
+        letter-spacing: 0.12em;
+        color: var(--color-border);
+        margin-bottom: 20px;
+    }
+
+    .question-input {
+        width: 100%;
+        padding: 18px;
+        font-family: 'VT323', monospace;
+        font-size: 1.1rem;
+        border: 4px solid var(--color-border-dark);
+        border-radius: 12px;
+        background-color: var(--color-panel-alt);
+        color: var(--color-text);
+        box-shadow: inset 4px 4px 0 #000;
+        margin-bottom: 18px;
+    }
+
+    .question-input:focus {
+        outline: none;
+        border-color: var(--color-border);
+        box-shadow: inset 4px 4px 0 #000, 0 0 0 4px rgba(248, 248, 113, 0.15);
+    }
+
+    .question-input::placeholder {
+        color: rgba(245, 245, 255, 0.45);
+        letter-spacing: 0.08em;
+    }
+
+    .submit-btn {
+        background-color: var(--color-panel-alt);
+        color: var(--color-border);
+        border: 4px solid var(--color-border);
+        border-radius: 12px;
+        padding: 16px 32px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.9rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 6px 0 var(--color-shadow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 9px 0 var(--color-shadow);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 0 var(--color-shadow);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: 0 6px 0 var(--color-shadow);
+    }
+
+    .error-message {
+        background-color: rgba(255, 79, 121, 0.15);
+        border: 4px solid var(--color-warning);
+        color: var(--color-warning);
+        padding: 14px 18px;
+        border-radius: 12px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        display: none;
+        box-shadow: 0 6px 0 var(--color-shadow);
+    }
+
+    .error-message.active {
+        display: block;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        background-color: var(--color-panel);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 16px;
+        padding: 36px 20px;
+        box-shadow: 0 8px 0 var(--color-shadow);
+        color: var(--color-border);
+    }
+
+    .loading.active {
+        display: block;
+    }
+
+    .spinner {
+        margin: 0 auto 20px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 6px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--color-accent);
+        animation: spin 0.9s linear infinite;
+    }
+
+    .loading p {
+        color: var(--color-text);
+        letter-spacing: 0.12em;
+        margin-top: 6px;
+    }
+
+    .moderator-card h3 {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.95rem;
+        color: var(--color-border);
+        letter-spacing: 0.12em;
+        margin-bottom: 14px;
+        text-transform: uppercase;
+    }
+
+    .moderator-card p {
+        color: var(--color-muted);
+        letter-spacing: 0.08em;
+        margin-bottom: 18px;
+    }
+
+    .moderator-info {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .moderator-badge {
+        background-color: var(--color-panel-alt);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 10px;
+        padding: 8px 14px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        color: var(--color-text);
+        letter-spacing: 0.08em;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 22px;
+    }
+
+    .vote-card {
+        background-color: var(--color-panel-alt);
+        border: 4px solid var(--color-border-dark);
+        border-top-width: 10px;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 8px 0 var(--color-shadow);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .vote-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 0 var(--color-shadow);
+    }
+
+    .vote-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+    }
+
+    .vote-emoji {
+        font-size: 1.6rem;
+        text-shadow: 2px 2px 0 #000;
+    }
+
+    .vote-personality {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        color: var(--color-border);
+        margin-bottom: 6px;
+    }
+
+    .vote-model {
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+    }
+
+    .vote-answer {
+        background-color: var(--color-panel);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        color: var(--color-border);
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        box-shadow: inset 4px 4px 0 #000;
+    }
+
+    .vote-reasoning {
+        color: var(--color-text);
+        letter-spacing: 0.06em;
+        line-height: 1.5;
+        font-size: 1rem;
+    }
+
+    .verdict-card {
+        text-align: center;
+    }
+
+    .verdict-title {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.85rem;
+        letter-spacing: 0.18em;
+        color: var(--color-muted);
+        margin-bottom: 18px;
+    }
+
+    .verdict-result {
+        font-family: 'Press Start 2P', cursive;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        letter-spacing: 0.2em;
+        color: var(--color-border);
+        text-transform: uppercase;
+        text-shadow: 4px 4px 0 #000;
+        margin-bottom: 24px;
+    }
+
+    .vote-counts {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    .vote-count-item {
+        background-color: var(--color-panel-alt);
+        border: 4px solid var(--color-border-dark);
+        border-radius: 12px;
+        padding: 12px 18px;
+        min-width: 110px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        color: var(--color-text);
+        box-shadow: 4px 4px 0 #000;
+        text-align: center;
+        text-transform: uppercase;
+    }
+
+    .vote-count-number {
+        display: block;
+        font-size: 1.8rem;
+        color: var(--color-border);
+        text-shadow: 2px 2px 0 #000;
+        margin-bottom: 6px;
+    }
+
+    #results {
+        display: none;
+    }
+
+    #results.active {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
+    }
+
+    .debate-log-container {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        max-height: 600px;
+        overflow-y: auto;
+        padding: 12px;
+        background-color: var(--color-bg);
+        border-radius: 12px;
+    }
+
+    .debate-round-header {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.85rem;
+        color: var(--color-border);
+        letter-spacing: 0.12em;
+        margin: 18px 0 12px 0;
+        text-align: center;
+        text-transform: uppercase;
+        padding: 10px;
+        background-color: var(--color-panel-alt);
+        border: 3px solid var(--color-border-dark);
+        border-radius: 8px;
+    }
+
+    .debate-message {
+        background-color: var(--color-panel);
+        border-left: 6px solid;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 10px;
+        box-shadow: 4px 4px 0 #000;
+        transition: transform 0.2s ease;
+    }
+
+    .debate-message:hover {
+        transform: translateX(4px);
+    }
+
+    .debate-message.silent {
+        opacity: 0.5;
+        font-style: italic;
+    }
+
+    .debate-message.position-changed {
+        border-left-width: 10px;
+        background-color: rgba(255, 215, 0, 0.1);
+        animation: pulse 2s ease infinite;
+    }
+
+    .debate-speaker {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+    }
+
+    .debate-speaker-emoji {
+        font-size: 1.3rem;
+    }
+
+    .debate-speaker-name {
+        font-weight: bold;
+    }
+
+    .debate-position-badge {
+        background-color: var(--color-panel-alt);
+        border: 3px solid var(--color-border-dark);
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.6rem;
+        color: var(--color-border);
+        margin-left: auto;
+    }
+
+    .debate-message-text {
+        color: var(--color-text);
+        letter-spacing: 0.06em;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    .change-badge {
+        display: inline-block;
+        background-color: var(--color-accent);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.55rem;
+        margin-left: 8px;
+        box-shadow: 2px 2px 0 #000;
+    }
+
+    .position-change-item {
+        background-color: var(--color-panel-alt);
+        border: 3px solid var(--color-border);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        font-family: 'Press Start 2P', cursive;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 4px 4px 0 #000;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+
+    @media (max-width: 820px) {
+        body {
+            padding: 26px 14px 40px;
+        }
+
+        .container {
+            gap: 20px;
+        }
+
+        .status-strip {
+            justify-content: center;
+        }
+
+        .results-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .question-card,
+        .moderator-card,
+        .verdict-card {
+            padding: 24px;
+        }
+        
+        .debate-log-container {
+            max-height: 400px;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Council ⚖️</h1>
+            <p>11 AI Personalities Debate with FREE WILL - They Read & Respond to Each Other!</p>
+            <p style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">💬 3 Rounds | 🤔 Smart Decisions Based on What They Read | 🔄 Position Changes | Plus 1 Moderator = 12 AIs</p>
+        </div>
+
+        <div class="question-card">
+            <h2 style="margin-bottom: 20px; color: #2d3748;">What's your question?</h2>
+            <input 
+                type="text" 
+                id="questionInput" 
+                class="question-input" 
+                placeholder="e.g., Should we build on Mars? or Which is better: blue or red?"
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="submit-btn" onclick="askCouncil()" id="submitBtn">
+                🗳️ Ask the Council
+            </button>
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <h2>The AI Council is deliberating...</h2>
+            <p>🧠 Moderator analyzing question options...</p>
+            <p>💬 Round 1: All 11 AIs giving opening statements with reasoning...</p>
+            <p>🗣️ Round 2: AIs READ each other's reasoning & decide to intervene or observe...</p>
+            <p>🔄 Round 3: Final arguments - AIs may change positions if convinced by others...</p>
+            <p style="margin-top: 10px; color: var(--color-border);">This may take 2-3 minutes - AIs are reading & responding to each other!</p>
+        </div>
+
+        <div id="results">
+            <div class="moderator-card" id="moderatorCard" style="display: none;">
+                <h3>🧠 Moderator AI Analysis</h3>
+                <p style="color: #718096; font-size: 0.9em; margin-bottom: 10px;">The Moderator AI extracts the valid answer options from your question</p>
+                <div class="moderator-info" id="moderatorInfo"></div>
+            </div>
+
+            <div class="verdict-card">
+                <div class="verdict-title">🏆 Council Verdict</div>
+                <div class="verdict-result" id="verdictText">-</div>
+                <div class="vote-counts" id="voteCounts"></div>
+            </div>
+
+            <div class="moderator-card" id="changesCard" style="display: none;">
+                <h3>🔄 Position Changes</h3>
+                <p style="color: #718096; font-size: 0.9em; margin-bottom: 10px;">AIs who were convinced and changed their minds during the debate</p>
+                <div id="positionChanges"></div>
+            </div>
+
+            <div class="moderator-card" id="debateLogCard" style="display: none;">
+                <h3>💬 Full Debate Transcript</h3>
+                <p style="color: #718096; font-size: 0.9em; margin-bottom: 10px;">Complete conversation log showing AI-to-AI communication across 3 rounds</p>
+                <div id="debateLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                askCouncil();
+            }
+        }
+
+        async function askCouncil() {
+            const question = document.getElementById('questionInput').value.trim();
+            const errorMsg = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Validation
+            if (!question) {
+                errorMsg.textContent = 'Please enter a question!';
+                errorMsg.classList.add('active');
+                return;
+            }
+
+            // Hide error, show loading
+            errorMsg.classList.remove('active');
+            results.classList.remove('active');
+            loading.classList.add('active');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/council', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Something went wrong');
+                }
+
+                displayResults(data);
+            } catch (error) {
+                errorMsg.textContent = 'Error: ' + error.message;
+                errorMsg.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+                submitBtn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const results = document.getElementById('results');
+            const verdictText = document.getElementById('verdictText');
+            const voteCounts = document.getElementById('voteCounts');
+            const moderatorCard = document.getElementById('moderatorCard');
+            const moderatorInfo = document.getElementById('moderatorInfo');
+            const changesCard = document.getElementById('changesCard');
+            const positionChanges = document.getElementById('positionChanges');
+            const debateLogCard = document.getElementById('debateLogCard');
+            const debateLog = document.getElementById('debateLog');
+
+            // Show moderator analysis
+            if (data.moderator) {
+                moderatorInfo.innerHTML = `
+                    <div class="moderator-badge">Type: ${data.moderator.type}</div>
+                    <div class="moderator-badge">Options: ${data.moderator.options.join(', ')}</div>
+                `;
+                moderatorCard.style.display = 'block';
+            }
+
+            // Display verdict
+            verdictText.textContent = data.verdict;
+
+            // Display vote counts
+            voteCounts.innerHTML = '';
+            for (const [answer, count] of Object.entries(data.vote_counts)) {
+                const countItem = document.createElement('div');
+                countItem.className = 'vote-count-item';
+                countItem.innerHTML = `
+                    <div class="vote-count-number">${count}</div>
+                    <div>${answer}</div>
+                `;
+                voteCounts.appendChild(countItem);
+            }
+
+            // Display position changes
+            if (data.position_changes && data.position_changes.length > 0) {
+                positionChanges.innerHTML = '';
+                data.position_changes.forEach(change => {
+                    const changeItem = document.createElement('div');
+                    changeItem.className = 'position-change-item';
+                    changeItem.innerHTML = `
+                        <span style="font-size: 1.5rem;">${change.emoji}</span>
+                        <span>${change.speaker}</span>
+                        <span class="change-badge">Changed in Round ${change.round}</span>
+                    `;
+                    positionChanges.appendChild(changeItem);
+                });
+                changesCard.style.display = 'block';
+            }
+
+            // Display debate log (conversation transcript)
+            if (data.debate_log && data.debate_log.length > 0) {
+                debateLog.innerHTML = '<div class="debate-log-container"></div>';
+                const container = debateLog.querySelector('.debate-log-container');
+                
+                let currentRound = 0;
+                data.debate_log.forEach(log => {
+                    // Add round header if new round
+                    if (log.round !== currentRound) {
+                        currentRound = log.round;
+                        const roundHeader = document.createElement('div');
+                        roundHeader.className = 'debate-round-header';
+                        const roundNames = {1: 'Round 1: Opening Statements', 2: 'Round 2: Rebuttals & Debate', 3: 'Round 3: Final Arguments'};
+                        roundHeader.textContent = roundNames[log.round] || `Round ${log.round}`;
+                        container.appendChild(roundHeader);
+                    }
+                    
+                    // Create message card
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'debate-message';
+                    messageDiv.style.borderLeftColor = log.color;
+                    
+                    if (log.type === 'silent') {
+                        messageDiv.classList.add('silent');
+                    }
+                    if (log.position_changed) {
+                        messageDiv.classList.add('position-changed');
+                    }
+                    
+                    messageDiv.innerHTML = `
+                        <div class="debate-speaker">
+                            <span class="debate-speaker-emoji">${log.emoji}</span>
+                            <span class="debate-speaker-name" style="color: ${log.color}">${log.speaker}</span>
+                            ${log.position_changed ? '<span class="change-badge">🔄 CHANGED POSITION</span>' : ''}
+                            <span class="debate-position-badge">${log.position}</span>
+                        </div>
+                        <div class="debate-message-text">${log.message}</div>
+                    `;
+                    
+                    container.appendChild(messageDiv);
+                });
+                
+                debateLogCard.style.display = 'block';
+            }
+
+            // Show results
+            results.classList.add('active');
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+
